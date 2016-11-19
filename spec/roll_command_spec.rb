@@ -51,5 +51,12 @@ describe RollCommand do
     expect(@player.status).to eq(:wait_for_choose_gift)
   end
 
+  it 'should change player status to end_turn in other place' do
+    target = Place.new
+    allow(@map).to receive(:move) {target}
+    @player.execute(@roll)
+    expect(@player.status).to eq(:end_turn)
+  end
+
 
 end
