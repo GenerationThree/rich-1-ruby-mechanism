@@ -1,6 +1,7 @@
+require_relative 'config.rb'
 class Player
-  attr_reader :current_place, :balance, :lands
-  attr_accessor :status
+  attr_reader :current_place, :balance, :lands, :tools, :tool_quantity
+  attr_accessor :status, :points
 
   def initialize *args
     unless args.empty?
@@ -11,6 +12,8 @@ class Player
     end
     @status ||= :wait_for_command
     @lands = []
+    @tools = Hash.new(0)
+    @tool_quantity = 0
   end
 
   def execute(command)
@@ -26,7 +29,7 @@ class Player
     @current_place = target
   end
 
-  def buy(land)
+  def buy_land(land)
     if (balance >= land.price && land.owner.nil?)
       @lands << land
       @balance -= land.price
@@ -38,9 +41,20 @@ class Player
   end
 
   def upgrade(land)
-    if (balance >= land.price && land.owner == self)
+    if (@balance >= land.price && land.owner == self)
       land.upgrade
       @balance -= land.price
+      true
+    else
+      false
+    end
+  end
+
+  def buy_tool(tool)
+    if (@points >= tool.points && @tool_quantity < ToolConf::MAX_QUANTITY)
+      @tools[tool] += 1
+      @tool_quantity += 1
+      @points -= tool.points
       true
     else
       false
